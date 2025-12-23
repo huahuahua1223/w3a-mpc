@@ -1,0 +1,612 @@
+/* ==================== 玻璃态效果基础 ==================== */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* ==================== 全局容器 ==================== */
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ==================== 头部样式 ==================== */
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 25px 35px;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  animation: fadeUp 0.8s ease-out;
+}
+
+.header-container h1 {
+  margin: 0;
+  flex: 1;
+  min-width: 300px;
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: left;
+  letter-spacing: -0.02em;
+}
+
+.header-container h1 a {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.header-container h1 a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.header-container .subtitle {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Inter', sans-serif;
+}
+
+.logout-btn {
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== 主要内容区域 ==================== */
+
+.main-content {
+  margin-top: 30px;
+  animation: fadeUp 0.8s ease-out 0.2s both;
+}
+
+/* ==================== 状态徽章 ==================== */
+
+.status-badge {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 30px 0;
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3);
+  animation: fadeUp 0.8s ease-out 0.1s both;
+  transition: all 0.3s ease;
+}
+
+.status-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4);
+}
+
+.status-badge.logged-in {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.status-badge.required-share {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-badge.logged-out {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.status-badge.not-initialized {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+/* ==================== 区块样式 ==================== */
+
+.section {
+  margin: 35px 0;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+  animation: fadeUp 0.8s ease-out;
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* 为多个 section 添加交错动画 */
+.section:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.section:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.section:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+.section:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.section h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ==================== 网格布局 ==================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 25px 0;
+}
+
+/* ==================== 输入组 ==================== */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.95);
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(167, 139, 250, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2),
+              inset 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ==================== 按钮样式 ==================== */
+
+.card {
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(167, 139, 250, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.2);
+  text-align: center;
+}
+
+.card:hover:not(:disabled) {
+  background: rgba(167, 139, 250, 0.25);
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 8px 24px rgba(167, 139, 250, 0.3);
+  transform: translateY(-3px);
+}
+
+.card:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.25);
+}
+
+.card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.card.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== OTP 相关 ==================== */
+
+.otp-container {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3);
+  animation: fadeUp 0.8s ease-out;
+}
+
+.otp-container h2 {
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+.otp-input-container {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.button-group button {
+  flex: 1;
+}
+
+/* ==================== 恢复面板 ==================== */
+
+.recovery-container {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 40px;
+  background: rgba(251, 191, 36, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(251, 191, 36, 0.2);
+  animation: fadeUp 0.8s ease-out;
+}
+
+.recovery-container h2 {
+  color: #fbbf24;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+.recovery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.recovery-options .input-group {
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.recovery-options .input-group:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== 控制台 ==================== */
+
+#console {
+  margin-top: 50px;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 450px;
+  overflow-y: auto;
+  text-align: left;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  animation: fadeUp 0.8s ease-out 0.6s both;
+}
+
+#console p {
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+/* ==================== 标题和副标题 ==================== */
+
+.title {
+  line-height: 1.2;
+  font-size: 3rem;
+  text-align: center;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.title a {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.title a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+.subtitle {
+  line-height: 1.4;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 12px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
+
+/* ==================== 页脚 ==================== */
+
+.footer {
+  margin-top: 80px;
+  padding-top: 35px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.95rem;
+  animation: fadeUp 0.8s ease-out 0.7s both;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.footer a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* ==================== 禁用状态 ==================== */
+
+.disabledDiv {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+/* ==================== 加载动画 ==================== */
+
+.loading {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spinner 0.7s linear infinite;
+}
+
+/* ==================== 动画定义 ==================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 30px 15px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px 25px;
+  }
+
+  .header-container h1 {
+    min-width: auto;
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .header-container .subtitle {
+    text-align: center;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .section {
+    padding: 25px 20px;
+  }
+
+  .section h2 {
+    font-size: 1.3rem;
+  }
+
+  .otp-container,
+  .recovery-container {
+    padding: 30px 25px;
+  }
+
+  /* 移动端减少模糊强度以提升性能 */
+  .glass-card,
+  .section,
+  .header-container,
+  .input,
+  .card {
+    backdrop-filter: blur(5px) saturate(150%);
+    -webkit-backdrop-filter: blur(5px) saturate(150%);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    width: 92%;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+}
+
+/* ==================== 打印样式 ==================== */
+
+@media print {
+  .header-container,
+  .footer,
+  .logout-btn {
+    display: none;
+  }
+
+  .container {
+    background: white;
+    color: black;
+  }
+
+  .section,
+  .card,
+  .input {
+    background: white;
+    border: 1px solid #ccc;
+  }
+}

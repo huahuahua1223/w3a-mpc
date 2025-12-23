@@ -1,0 +1,38 @@
+{
+  "name": "w3a-mpc-wallet-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@web3auth/mpc-core-kit": "3.4.3",
+    "@web3auth/ethereum-mpc-provider": "9.7.0",
+    "@web3auth/base": "9.7.0",
+    "@web3auth/base-provider": "9.7.0",
+    "@toruslabs/tss-dkls-lib": "4.1.0",
+    "@tkey/common-types": "^15.1.0",
+    "@babel/runtime": "^7.23.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "viem": "^2.21.18",
+    "bn.js": "^5.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "@types/node": "^20.16.1",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@types/bn.js": "^5.2.0",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10",
+    "empty-module": "^0.0.2"
+  }
+}
+
