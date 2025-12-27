@@ -7,8 +7,9 @@
 export const uiConsole = (...args: any[]): void => {
   const el = document.querySelector("#console>p");
   if (el) {
-    el.innerHTML = JSON.stringify(args || {}, null, 2);
+    el.textContent = args
+      .map((arg) => (typeof arg === "string" ? arg : JSON.stringify(arg, null, 2)))
+      .join("\n");
   }
   console.log(...args);
 };
-

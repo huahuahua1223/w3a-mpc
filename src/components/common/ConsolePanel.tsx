@@ -4,8 +4,8 @@
  */
 export const ConsolePanel: React.FC = () => {
   return (
-    <div id="console" style={{ whiteSpace: "pre-line" }}>
-      <p style={{ whiteSpace: "pre-line" }}></p>
+    <div id="console" style={{ whiteSpace: "pre-wrap" }}>
+      <p style={{ whiteSpace: "pre-wrap" }}></p>
     </div>
   );
 };
