@@ -19,6 +19,26 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
   const [backupFactorKey, setBackupFactorKey] = useState<string>("");
 
   /**
+   * 获取有效的因子列表（过滤空数组）
+   * @param shareDescriptions - shareDescriptions 对象
+   * @returns 有效的因子列表
+   */
+  const getValidFactors = (shareDescriptions: Record<string, string[]>) => {
+    return Object.entries(shareDescriptions)
+      .map(([pub, arr]) => {
+        if (!arr || arr.length === 0) return null; // 过滤空数组
+        const first = arr[0];
+        try {
+          const parsedData = JSON.parse(first);
+          return { pub, ...parsedData };
+        } catch (e) {
+          return { pub, raw: first };
+        }
+      })
+      .filter(Boolean) as Array<{ pub: string; [key: string]: any }>;
+  };
+
+  /**
    * 输入备份因子密钥
    */
   const inputBackupFactorKey = async () => {
@@ -107,23 +127,12 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
       uiConsole("正在同步元数据...");
       await coreKitInstance.init();
       
-      // 检查是否已经存在助记词因子
+      // 检查是否已经存在助记词因子（使用过滤后的列表）
       const keyDetails = coreKitInstance.getKeyDetails();
-      let hasSeedPhraseFactor = false;
-      
-      for (const [, value] of Object.entries(keyDetails.shareDescriptions)) {
-        if (value.length > 0) {
-          try {
-            const parsedData = JSON.parse(value[0]);
-            if (parsedData.module === FactorKeyTypeShareDescription.SeedPhrase) {
-              hasSeedPhraseFactor = true;
-              break;
-            }
-          } catch (e) {
-            // 忽略解析错误
-          }
-        }
-      }
+      const validFactors = getValidFactors(keyDetails.shareDescriptions);
+      const hasSeedPhraseFactor = validFactors.some(
+        factor => factor.module === FactorKeyTypeShareDescription.SeedPhrase
+      );
       
       if (hasSeedPhraseFactor) {
         uiConsole("❌ 错误：已存在助记词因子！如需创建新的助记词因子，请先删除现有的助记词因子。");
@@ -158,23 +167,12 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
           // 重新初始化以同步元数据
           await coreKitInstance.init();
           
-          // 检查是否已存在助记词因子
+          // 检查是否已存在助记词因子（使用过滤后的列表）
           const keyDetails = coreKitInstance.getKeyDetails();
-          let hasSeedPhraseFactor = false;
-          
-          for (const [, value] of Object.entries(keyDetails.shareDescriptions)) {
-            if (value.length > 0) {
-              try {
-                const parsedData = JSON.parse(value[0]);
-                if (parsedData.module === FactorKeyTypeShareDescription.SeedPhrase) {
-                  hasSeedPhraseFactor = true;
-                  break;
-                }
-              } catch (e) {
-                // 忽略解析错误
-              }
-            }
-          }
+          const validFactors = getValidFactors(keyDetails.shareDescriptions);
+          const hasSeedPhraseFactor = validFactors.some(
+            factor => factor.module === FactorKeyTypeShareDescription.SeedPhrase
+          );
           
           if (hasSeedPhraseFactor) {
             uiConsole("❌ 错误：已存在助记词因子！如需创建新的助记词因子，请先删除现有的助记词因子。");
@@ -243,7 +241,7 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
   };
 
   /**
-   * 删除因子
+   * 删除助记词因子
    */
   const deleteFactor = async () => {
     if (!coreKitInstance) {
@@ -251,40 +249,134 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
     }
 
     try {
-      let factorPub: string | undefined;
+      // 先同步元数据
+      uiConsole("正在同步元数据...");
+      await coreKitInstance.init();
 
-      // 查找要删除的因子
-      for (const [key, value] of Object.entries(coreKitInstance.getKeyDetails().shareDescriptions)) {
-        if (value.length > 0) {
-          const parsedData = JSON.parse(value[0]);
-          if (parsedData.module === FactorKeyTypeShareDescription.SocialShare) {
-            factorPub = key;
-          }
-        }
-      }
+      // 查找要删除的助记词因子（使用过滤后的列表）
+      const keyDetails = coreKitInstance.getKeyDetails();
+      const validFactors = getValidFactors(keyDetails.shareDescriptions);
+      const seedPhraseFactor = validFactors.find(
+        factor => factor.module === FactorKeyTypeShareDescription.SeedPhrase
+      );
+      const factorPub = seedPhraseFactor?.pub;
 
       if (factorPub) {
-        uiConsole("正在删除社交因子...", "Factor Pub:", factorPub);
+        // 确认删除
+        const confirm = window.confirm(
+          "⚠️ 警告：删除助记词因子后，您将无法使用该助记词恢复账户！\n\n" +
+          "请确保您已经保存了助记词，或者有其他恢复方式。\n\n" +
+          "是否继续删除？"
+        );
+
+        if (!confirm) {
+          uiConsole("已取消删除助记词因子");
+          return;
+        }
+
+        uiConsole("正在删除助记词因子...", "Factor Pub:", factorPub);
         const pub = Point.fromSEC1(secp256k1, factorPub);
         await coreKitInstance.deleteFactor(pub);
         await coreKitInstance.commitChanges();
-        uiConsole("社交因子已删除");
+        
+        // 重新初始化以获取最终状态
+        uiConsole("正在同步最终状态...");
+        await coreKitInstance.init();
+        
+        // 输出最终的密钥详情（过滤空数组）
+        const finalKeyDetails = coreKitInstance.getKeyDetails();
+        const validFactors = getValidFactors(finalKeyDetails.shareDescriptions);
+        uiConsole("✅ 助记词因子已删除");
+        uiConsole("最终状态:", {
+          ...finalKeyDetails,
+          shareDescriptions: validFactors.reduce((acc, factor) => {
+            acc[factor.pub] = [JSON.stringify(factor)];
+            return acc;
+          }, {} as Record<string, string[]>)
+        });
       } else {
-        uiConsole("未找到可删除的社交因子");
+        uiConsole("❌ 未找到可删除的助记词因子");
       }
-    } catch (error) {
-      uiConsole("删除因子失败:", error);
+    } catch (error: any) {
+      if (error?.code === 1401) {
+        uiConsole("检测到元数据冲突，尝试重新同步...");
+        try {
+          await coreKitInstance.init();
+          
+          // 查找要删除的助记词因子（使用过滤后的列表）
+          const keyDetails = coreKitInstance.getKeyDetails();
+          const validFactors = getValidFactors(keyDetails.shareDescriptions);
+          const seedPhraseFactor = validFactors.find(
+            factor => factor.module === FactorKeyTypeShareDescription.SeedPhrase
+          );
+          const factorPub = seedPhraseFactor?.pub;
+
+          if (factorPub) {
+            const confirm = window.confirm(
+              "⚠️ 警告：删除助记词因子后，您将无法使用该助记词恢复账户！\n\n" +
+              "请确保您已经保存了助记词，或者有其他恢复方式。\n\n" +
+              "是否继续删除？"
+            );
+
+            if (!confirm) {
+              uiConsole("已取消删除助记词因子");
+              return;
+            }
+
+            const pub = Point.fromSEC1(secp256k1, factorPub);
+            await coreKitInstance.deleteFactor(pub);
+            await coreKitInstance.commitChanges();
+            
+            // 重新初始化以获取最终状态
+            uiConsole("正在同步最终状态...");
+            await coreKitInstance.init();
+            
+            // 输出最终的密钥详情（过滤空数组）
+            const finalKeyDetails = coreKitInstance.getKeyDetails();
+            const validFactors = getValidFactors(finalKeyDetails.shareDescriptions);
+            uiConsole("✅ 助记词因子已删除");
+            uiConsole("最终状态:", {
+              ...finalKeyDetails,
+              shareDescriptions: validFactors.reduce((acc, factor) => {
+                acc[factor.pub] = [JSON.stringify(factor)];
+                return acc;
+              }, {} as Record<string, string[]>)
+            });
+          } else {
+            uiConsole("❌ 未找到可删除的助记词因子");
+          }
+        } catch (retryError) {
+          uiConsole("删除助记词因子失败（重试后）:", retryError);
+        }
+      } else {
+        uiConsole("删除助记词因子失败:", error);
+      }
     }
   };
 
   /**
    * 获取密钥详情
+   * 过滤空数组，只显示有效的因子
    */
   const getKeyDetails = async () => {
     if (!coreKitInstance) {
       throw new Error("coreKitInstance not found");
     }
-    uiConsole(coreKitInstance.getKeyDetails());
+    
+    const keyDetails = coreKitInstance.getKeyDetails();
+    const validFactors = getValidFactors(keyDetails.shareDescriptions);
+    
+    // 构建过滤后的密钥详情
+    const filteredKeyDetails = {
+      ...keyDetails,
+      // totalFactors: validFactors.length, // 更新为实际有效因子数量
+      shareDescriptions: validFactors.reduce((acc, factor) => {
+        acc[factor.pub] = [JSON.stringify(factor)];
+        return acc;
+      }, {} as Record<string, string[]>)
+    };
+    
+    uiConsole(filteredKeyDetails);
   };
 
   return {
