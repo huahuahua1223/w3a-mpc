@@ -52,22 +52,50 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
     }
 
     try {
+      // 先重新初始化以同步服务器的最新元数据，解决元数据版本冲突问题
+      uiConsole("正在同步元数据...");
+      await coreKitInstance.init();
+      
+      // 启用 MFA
       const factorKey = await coreKitInstance.enableMFA({});
       const factorKeyMnemonic = keyToMnemonic(factorKey);
 
+      // 提交更改到服务器
       if (coreKitInstance.status === COREKIT_STATUS.LOGGED_IN) {
         await coreKitInstance.commitChanges();
       }
 
       uiConsole("MFA 已启用，备份密钥（助记词）:", factorKeyMnemonic);
       setBackupFactorKey(factorKey);
-    } catch (error) {
-      uiConsole("启用 MFA 失败:", error);
+    } catch (error: any) {
+      // 如果是元数据冲突错误，尝试重新初始化
+      if (error?.code === 1401) {
+        uiConsole("检测到元数据冲突，尝试重新同步...");
+        try {
+          // 重新初始化以同步元数据
+          await coreKitInstance.init();
+          // 重试启用 MFA
+          const factorKey = await coreKitInstance.enableMFA({});
+          const factorKeyMnemonic = keyToMnemonic(factorKey);
+          
+          if (coreKitInstance.status === COREKIT_STATUS.LOGGED_IN) {
+            await coreKitInstance.commitChanges();
+          }
+          
+          uiConsole("MFA 已启用，备份密钥（助记词）:", factorKeyMnemonic);
+          setBackupFactorKey(factorKey);
+        } catch (retryError) {
+          uiConsole("启用 MFA 失败（重试后）:", retryError);
+        }
+      } else {
+        uiConsole("启用 MFA 失败:", error);
+      }
     }
   };
 
   /**
    * 创建助记词因子
+   * 注意：每次调用都会生成新的助记词，如果已存在助记词因子，会提示用户
    */
   const createMnemonicFactor = async () => {
     if (!coreKitInstance) {
@@ -75,6 +103,35 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
     }
 
     try {
+      // 先重新初始化以同步服务器的最新元数据，解决元数据版本冲突问题
+      uiConsole("正在同步元数据...");
+      await coreKitInstance.init();
+      
+      // 检查是否已经存在助记词因子
+      const keyDetails = coreKitInstance.getKeyDetails();
+      let hasSeedPhraseFactor = false;
+      
+      for (const [, value] of Object.entries(keyDetails.shareDescriptions)) {
+        if (value.length > 0) {
+          try {
+            const parsedData = JSON.parse(value[0]);
+            if (parsedData.module === FactorKeyTypeShareDescription.SeedPhrase) {
+              hasSeedPhraseFactor = true;
+              break;
+            }
+          } catch (e) {
+            // 忽略解析错误
+          }
+        }
+      }
+      
+      if (hasSeedPhraseFactor) {
+        uiConsole("❌ 错误：已存在助记词因子！如需创建新的助记词因子，请先删除现有的助记词因子。");
+        return;
+      }
+      
+      // 创建助记词因子
+      uiConsole("正在生成新的助记词因子...");
       const factorKey = generateFactorKey();
       await coreKitInstance.createFactor({
         shareType: TssShareType.RECOVERY,
@@ -84,13 +141,69 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
 
       const factorKeyMnemonic = await keyToMnemonic(factorKey.private.toString("hex"));
 
+      // 提交更改到Web3Auth 的分布式网络
       if (coreKitInstance.status === COREKIT_STATUS.LOGGED_IN) {
         await coreKitInstance.commitChanges();
       }
 
-      uiConsole("助记词因子已创建:", factorKeyMnemonic);
-    } catch (error) {
-      uiConsole("创建助记词因子失败:", error);
+      uiConsole("✅ 助记词因子已创建！");
+      uiConsole("⚠️ 重要：请立即保存以下助记词，丢失后将无法恢复账户！");
+      uiConsole("助记词:", factorKeyMnemonic);
+      uiConsole("请将助记词保存在安全的地方，不要分享给任何人！");
+    } catch (error: any) {
+      // 如果是元数据冲突错误，尝试重新初始化
+      if (error?.code === 1401) {
+        uiConsole("检测到元数据冲突，尝试重新同步...");
+        try {
+          // 重新初始化以同步元数据
+          await coreKitInstance.init();
+          
+          // 检查是否已存在助记词因子
+          const keyDetails = coreKitInstance.getKeyDetails();
+          let hasSeedPhraseFactor = false;
+          
+          for (const [, value] of Object.entries(keyDetails.shareDescriptions)) {
+            if (value.length > 0) {
+              try {
+                const parsedData = JSON.parse(value[0]);
+                if (parsedData.module === FactorKeyTypeShareDescription.SeedPhrase) {
+                  hasSeedPhraseFactor = true;
+                  break;
+                }
+              } catch (e) {
+                // 忽略解析错误
+              }
+            }
+          }
+          
+          if (hasSeedPhraseFactor) {
+            uiConsole("❌ 错误：已存在助记词因子！如需创建新的助记词因子，请先删除现有的助记词因子。");
+            return;
+          }
+          
+          // 重试创建助记词因子
+          const factorKey = generateFactorKey();
+          await coreKitInstance.createFactor({
+            shareType: TssShareType.RECOVERY,
+            factorKey: factorKey.private,
+            shareDescription: FactorKeyTypeShareDescription.SeedPhrase,
+          });
+          
+          const factorKeyMnemonic = await keyToMnemonic(factorKey.private.toString("hex"));
+          
+          if (coreKitInstance.status === COREKIT_STATUS.LOGGED_IN) {
+            await coreKitInstance.commitChanges();
+          }
+          
+          uiConsole("✅ 助记词因子已创建！");
+          uiConsole("⚠️ 重要：请立即保存以下助记词，丢失后将无法恢复账户！");
+          uiConsole("助记词:", factorKeyMnemonic);
+        } catch (retryError) {
+          uiConsole("创建助记词因子失败（重试后）:", retryError);
+        }
+      } else {
+        uiConsole("创建助记词因子失败:", error);
+      }
     }
   };
 
