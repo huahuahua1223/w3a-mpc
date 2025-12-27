@@ -158,7 +158,6 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
       uiConsole("✅ 助记词因子已创建！");
       uiConsole("⚠️ 重要：请立即保存以下助记词，丢失后将无法恢复账户！");
       uiConsole("助记词:", factorKeyMnemonic);
-      uiConsole("请将助记词保存在安全的地方，不要分享给任何人！");
     } catch (error: any) {
       // 如果是元数据冲突错误，尝试重新初始化
       if (error?.code === 1401) {
