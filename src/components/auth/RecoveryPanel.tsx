@@ -9,10 +9,12 @@ export const RecoveryPanel: React.FC<RecoveryPanelProps> = ({
   onGetDeviceFactor,
   onConvertMnemonic,
   onInputBackupKey,
+  onRestoreFromDrive,
   backupFactorKey,
   mnemonicFactor,
   setMnemonicFactor,
   disabled,
+  isRestoring,
 }) => {
   return (
     <div className="recovery-container">
@@ -20,9 +22,24 @@ export const RecoveryPanel: React.FC<RecoveryPanelProps> = ({
       <p className="subtitle">请使用以下任一方式恢复您的账户</p>
 
       <div className="recovery-options">
+        {/* Google Drive 恢复 */}
+        {onRestoreFromDrive && (
+          <div className="input-group">
+            <label className="label">方式 1: 从 Google Drive 恢复</label>
+            <p className="subtitle">使用之前备份到 Google Drive 的助记词</p>
+            <LoadingButton 
+              onClick={onRestoreFromDrive} 
+              disabled={disabled}
+              loading={isRestoring}
+            >
+              📥 从 Google Drive 恢复
+            </LoadingButton>
+          </div>
+        )}
+
         {/* 设备因子 */}
         <div className="input-group">
-          <label className="label">方式 1: 使用设备因子</label>
+          <label className="label">方式 2: 使用设备因子</label>
           <LoadingButton onClick={onGetDeviceFactor} disabled={disabled}>
             从设备获取因子
           </LoadingButton>
@@ -30,7 +47,7 @@ export const RecoveryPanel: React.FC<RecoveryPanelProps> = ({
 
         {/* 助记词恢复 */}
         <div className="input-group">
-          <label className="label">方式 2: 使用助记词恢复</label>
+          <label className="label">方式 3: 使用助记词恢复</label>
           <input
             type="text"
             className="input"
@@ -50,7 +67,7 @@ export const RecoveryPanel: React.FC<RecoveryPanelProps> = ({
         {/* 备份密钥 */}
         {backupFactorKey && (
           <div className="input-group">
-            <label className="label">方式 3: 使用备份密钥</label>
+            <label className="label">方式 4: 使用备份密钥</label>
             <p className="subtitle">密钥已从助记词生成</p>
             <LoadingButton onClick={onInputBackupKey} disabled={disabled}>
               输入备份密钥

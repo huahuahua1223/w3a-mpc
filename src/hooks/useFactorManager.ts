@@ -17,6 +17,7 @@ import { uiConsole } from "../utils/console";
  */
 export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => {
   const [backupFactorKey, setBackupFactorKey] = useState<string>("");
+  const [lastCreatedMnemonic, setLastCreatedMnemonic] = useState<string>("");
 
   /**
    * 获取有效的因子列表（过滤空数组）
@@ -158,6 +159,11 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
       uiConsole("✅ 助记词因子已创建！");
       uiConsole("⚠️ 重要：请立即保存以下助记词，丢失后将无法恢复账户！");
       uiConsole("助记词:", factorKeyMnemonic);
+      
+      // 保存助记词供备份使用
+      setLastCreatedMnemonic(factorKeyMnemonic);
+      
+      return factorKeyMnemonic;
     } catch (error: any) {
       // 如果是元数据冲突错误，尝试重新初始化
       if (error?.code === 1401) {
@@ -195,6 +201,11 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
           uiConsole("✅ 助记词因子已创建！");
           uiConsole("⚠️ 重要：请立即保存以下助记词，丢失后将无法恢复账户！");
           uiConsole("助记词:", factorKeyMnemonic);
+          
+          // 保存助记词供备份使用
+          setLastCreatedMnemonic(factorKeyMnemonic);
+          
+          return factorKeyMnemonic;
         } catch (retryError) {
           uiConsole("创建助记词因子失败（重试后）:", retryError);
         }
@@ -234,8 +245,10 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
       const factorKey = await coreKitInstance.getDeviceFactor();
       setBackupFactorKey(factorKey as string);
       uiConsole("设备因子:", factorKey);
+      return factorKey as string;
     } catch (error) {
       uiConsole("获取设备因子失败:", error);
+      throw error;
     }
   };
 
@@ -376,6 +389,7 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
     };
     
     uiConsole(filteredKeyDetails);
+    return filteredKeyDetails; // 返回密钥详情
   };
 
   return {
@@ -388,6 +402,7 @@ export const useFactorManager = (coreKitInstance: Web3AuthMPCCoreKit | null) => 
     getKeyDetails,
     backupFactorKey,
     setBackupFactorKey,
+    lastCreatedMnemonic,
   };
 };
 

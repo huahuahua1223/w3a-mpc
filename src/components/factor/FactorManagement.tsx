@@ -11,6 +11,11 @@ export const FactorManagement: React.FC<FactorManagementProps> = ({
   onDeleteFactor,
   onGetKeyDetails,
   onGetUserInfo,
+  onBackupToDrive,
+  onListBackupFiles,
+  onGetDeviceFactor,
+  hasRecoveryFactor,
+  isBackingUp,
 }) => {
   return (
     <div className="section">
@@ -21,6 +26,27 @@ export const FactorManagement: React.FC<FactorManagementProps> = ({
         <LoadingButton onClick={onDeleteFactor}>删除助记词因子</LoadingButton>
         <LoadingButton onClick={onGetKeyDetails}>查看密钥详情</LoadingButton>
         <LoadingButton onClick={onGetUserInfo}>获取用户信息</LoadingButton>
+        {onBackupToDrive && (
+          <LoadingButton 
+            onClick={onBackupToDrive}
+            loading={isBackingUp}
+          >
+            {hasRecoveryFactor 
+              ? "📤 备份到 Google Drive" 
+              : "📤 创建并备份到 Google Drive"
+            }
+          </LoadingButton>
+        )}
+        {onListBackupFiles && (
+          <LoadingButton onClick={onListBackupFiles}>
+            📁 查看 Drive 备份文件
+          </LoadingButton>
+        )}
+        {onGetDeviceFactor && (
+          <LoadingButton onClick={onGetDeviceFactor}>
+            🔑 查看设备因子
+          </LoadingButton>
+        )}
       </div>
     </div>
   );
