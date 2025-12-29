@@ -1,4 +1,4 @@
-import { createWalletClient, createPublicClient, custom, formatEther, parseEther } from 'viem';
+import { createWalletClient, createPublicClient, custom, formatEther, parseEther, http } from 'viem';
 import { mainnet, polygonAmoy, sepolia } from 'viem/chains';
 import type { IProvider } from "@web3auth/base";
 
@@ -67,6 +67,30 @@ export default class ViemRPC {
         return sepolia;
       default:
         return sepolia; // 默认使用 Sepolia
+    }
+  }
+
+  /**
+   * 根据链 ID 获取对应的 RPC URL
+   * 优先使用环境变量，否则使用公共 RPC
+   */
+  getRpcUrl(): string {
+    const chainId = this.provider.chainId;
+    
+    // 优先使用环境变量中的 RPC URL
+    const envRpcUrl = import.meta.env.VITE_RPC_URL;
+    if (envRpcUrl) {
+      return envRpcUrl;
+    }
+
+    // 根据链 ID 返回对应的公共 RPC
+    switch (chainId) {
+      case "1":
+        return "https://ethereum-rpc.publicnode.com"; // Ethereum Mainnet
+      case "0xaa36a7":
+        return "https://ethereum-sepolia-rpc.publicnode.com"; // Sepolia
+      default:
+        return "https://ethereum-sepolia-rpc.publicnode.com"; // 默认 Sepolia
     }
   }
 
@@ -206,12 +230,14 @@ export default class ViemRPC {
 
   /**
    * 读取智能合约
+   * 使用自定义 RPC 节点（更快、更稳定），不需要签名
    */
   async readContract(): Promise<any> {
     try {
+      // 使用 HTTP transport 连接到自定义 RPC 节点
       const publicClient = createPublicClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
+        transport: http(this.getRpcUrl())
       });
 
       // 合约地址（Sepolia 测试网示例合约）
